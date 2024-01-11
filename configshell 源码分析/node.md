@@ -80,14 +80,18 @@ class ExecutionError(Exception):
  ```python
      def __init__(self, name, parent=None, shell=None):
          '''
+         # 如果一个新对象的父 ConfigNode 为 Node，那么这个新对象就是一个新的根节点
          @param parent: The parent ConfigNode of the new object. If None, then
          the ConfigNode will be a root node.
+         # 父对象类型：ConfigNode 或者 None（自己本身就是根节点）
          @type parent: ConfigNode or None
          @param shell: The shell to attach a root node to.
          @type shell: ConfigShell
          '''
+         
          self._name = name
          self._children = set([])
+         # 根节点必须有与之关联的 shell
          if parent is None:
              if shell is None:
                  raise ValueError("A root ConfigNode must have a shell.")
@@ -96,64 +100,88 @@ class ExecutionError(Exception):
                  self._shell = shell
                  shell.attach_root_node(self)
          else:
+             # 如果该节点不是根节点，就不能有自己的 shell
              if shell is None:
                  self._parent = parent
                  self._shell = None
              else:
                  raise ValueError("A non-root ConfigNode can't have a shell.")
- 
+ 		
+         # 检查是不是根节点，如果不是就继续执行
          if self._parent is not None:
+             # 遍历父节点的子节点集合（相当于查看所有兄弟节点）
              for sibling in self._parent._children:
+                 # 比较兄弟节点和自己的名称是否重名
                  if sibling.name == name:
+                     # 如果重名就报错
                      raise ValueError("Name '%s' already used by a sibling."
                                       % self._name)
+             # 如果不重名，就将自己添加进父节点的子节点集合中，确保了在同一级别下节点名称的唯一性
              self._parent._children.add(self)
- 
+ 		
+         # 创建一个空字典，用于存储配置参数组
          self._configuration_groups = {}
- 
+ 		# 之后的一系列 self.define_config_group_param 方法是用于定义特定的配置参数
+         # 每次调用这个方法，都会为配置参数组添加一个新的参数
+         
+         # 例如，此方法就添加了名为 "tree_round_nodes" bool 类型参数，后面的 "Tree node 			# display style" 是该参数的描述信息
          self.define_config_group_param(
              'global', 'tree_round_nodes', 'bool',
              'Tree node display style.')
+         # 是否展示 tree 的状态
          self.define_config_group_param(
              'global', 'tree_status_mode', 'bool',
              'Whether or not to display status in tree.')
+         # 显示节点树的最大深度
          self.define_config_group_param(
              'global', 'tree_max_depth', 'number',
              'Maximum depth of displayed node tree.')
+         # 是否展示根节点
          self.define_config_group_param(
              'global', 'tree_show_root', 'bool',
              'Whether or not to display tree root.')
+         # console 的颜色模式
          self.define_config_group_param(
              'global', 'color_mode', 'bool',
              'Console color display mode.')
+         # 日志消息到控制台的级别
          self.define_config_group_param(
              'global', 'loglevel_console', 'loglevel',
              'Log level for messages going to the console.')
+         # 日志消息到日志文件的级别
          self.define_config_group_param(
              'global', 'loglevel_file', 'loglevel',
              'Log level for messages going to the log file.')
+         # 用于指定要使用的日志文件
          self.define_config_group_param(
              'global', 'logfile', 'string',
              'Logfile to use.')
+         # 默认的文本显示颜色样式
          self.define_config_group_param(
              'global', 'color_default', 'colordefault',
              'Default text display color.')
+         # 路径补全的颜色样式
          self.define_config_group_param(
              'global', 'color_path', 'color',
              'Color to use for path completions')
+         # 命令补全的颜色样式
          self.define_config_group_param(
              'global', 'color_command', 'color',
              'Color to use for command completions.')
+         # 参数补全的颜色样式
          self.define_config_group_param(
              'global', 'color_parameter', 'color',
              'Color to use for parameter completions.')
+         # 关键字补全的颜色样式
          self.define_config_group_param(
              'global', 'color_keyword', 'color',
              'Color to use for keyword completions.')
+         # shell 提示路径的最大长度，0 表示无限制
          self.define_config_group_param(
              'global', 'prompt_length', 'number',
              'Max length of the shell prompt path, 0 for infinite.')
- 
+         
+ 		# 如果用户没有 bookmarks，就设置为空
          if self.shell.prefs['bookmarks'] is None:
              self.shell.prefs['bookmarks'] = {}
  ```
