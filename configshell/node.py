@@ -43,6 +43,7 @@ class ConfigNode(object):
                  ============
                  This is a shell in which you can create, delete and configure
                  configuration objects.
+                 
 
                  The available commands depend on the current path or target
                  path you want to run a command in: different path have
