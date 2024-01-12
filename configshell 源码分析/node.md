@@ -75,7 +75,7 @@ class ExecutionError(Exception):
 
 
 
-## 3.2 `def __init__(self, name, parent=None, shell=None)`
+## 3.2 `def __init__()`
 
  ```python
      def __init__(self, name, parent=None, shell=None):
@@ -187,4 +187,54 @@ class ExecutionError(Exception):
  ```
 
 
+
+## 3.3 `def ui_type_number()`
+
+```python
+def ui_type_number(self, value=None, enum=False, reverse=False):
+        '''
+        UI parameter type helper for number parameter type.
+        # 指出该参数要进行类型检查的值
+        @param value: Value to check against the type.
+        # 指出该参数可以是任何类型的值
+        @type value: anything
+        # 只有当 value 被省略时，enum 才有意义；如果设置了这个参数，就返回类型可能的取值列表或者一个空列表；如果没有设置，就返回类型格式的文本描述
+        @param enum: Has a meaning only if value is omitted. If set, returns
+        a list of the possible values for the type, or [] if this is not
+        possible. If not set, returns a text description of the type format.
+        # enum：bool 类型
+        @type enum: bool
+        # 如果设置了 reverse，就会将内部值转为 UI 字符串表示？
+        @param reverse: If set, translates an internal value to its UI
+        string representation.
+        @type reverse: bool
+        @return: c.f. parameter enum description.
+        @rtype: str|list|None
+        # 如果值与类型不匹配就抛出异常
+        @raise ValueError: If the value does not check ok against the type.
+        '''
+        if reverse:
+            if value is not None:
+                return str(value)
+            else:
+                return 'n/a'
+
+        type_enum = []
+        syntax = "NUMBER"
+        if value is None:
+            if enum:
+                return type_enum
+            else:
+                return syntax
+        elif not value:
+            return None
+        else:
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError("Syntax error, '%s' is not a %s."
+                                 % (value, syntax))
+            else:
+                return value
+```
 
