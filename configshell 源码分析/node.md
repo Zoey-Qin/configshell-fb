@@ -198,7 +198,8 @@ def ui_type_number(self, value=None, enum=False, reverse=False):
         @param value: Value to check against the type.
         # 指出该参数可以是任何类型的值
         @type value: anything
-        # 只有当 value 被省略时，enum 才有意义；如果设置了这个参数，就返回类型可能的取值列表或者一个空列表；如果没有设置，就返回类型格式的文本描述
+        # 只有当 value 被省略时，enum 才有意义；如果设置了这个参数，就返回类型可能的取值列表或者
+        # 一个空列表；如果没有设置，就返回类型格式的文本描述
         @param enum: Has a meaning only if value is omitted. If set, returns
         a list of the possible values for the type, or [] if this is not
         possible. If not set, returns a text description of the type format.
@@ -213,6 +214,7 @@ def ui_type_number(self, value=None, enum=False, reverse=False):
         # 如果值与类型不匹配就抛出异常
         @raise ValueError: If the value does not check ok against the type.
         '''
+        # 如果设置了 reverse，就将 value 转为 str 或者返回一个 n/a
         if reverse:
             if value is not None:
                 return str(value)
