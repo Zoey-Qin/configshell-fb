@@ -228,3 +228,72 @@ def __init__(self, preferences_dir=None):
         self.con = console.Console()
 ```
 
+
+
+
+
+
+
+## def _cli_loop
+
+```python
+    def _cli_loop(self):
+        '''
+        Starts the configuration shell interactive loop, that:
+            - Goes to the last current path
+            - Displays the prompt
+            - Waits for user input
+            - Runs user command
+        '''
+        while not self._exit:
+            try:
+                # 定义补全键
+                readline.parse_and_bind("tab: complete")
+                # 补全方法为 self._complete
+                readline.set_completer(self._complete)
+                # 获取用户的输入作为命令行
+                cmdline = six.moves.input(self._get_prompt()).strip()
+            except EOFError:
+                self.con.raw_write('exit\n')
+                cmdline = "exit"
+            self.run_cmdline(cmdline)
+            # 将执行的命令写入 history
+            if self._save_history:
+                try:
+                    readline.write_history_file(self._cmd_history)
+                except IOError:
+                    self.log.warning(
+                        "Cannot write to command history file %s." \
+                        % self._cmd_history)
+                    self.log.warning(
+                        "Saving command history has been disabled!")
+                    self._save_history = False
+```
+
+- 这段代码定义了一个名为 `_cli_loop` 的方法，用于启动交互式配置 shell 的循环。
+
+  在方法实现中，使用了一个 while 循环来持续处理用户输入，直到设定的退出条件（`self._exit`为True）触发为止。
+
+  在循环中，首先使用 `readline` 库设置命令行自动补全的绑定，并设置自动补全方法为 `self._complete` 。接下来，通过 `six.moves.input` 获取用户的输入作为命令行。
+
+  如果捕获到 `EOFError` 异常（通常表示用户按下Ctrl+D结束输入），则输出"exit"并将其作为命令行。然后调用`self.run_cmdline`方法执行用户输入的命令。
+
+  在执行完用户命令后，根据`self._save_history`的值，尝试将命令历史记录写入命令历史文件中。如果写入失败，记录警告信息，并禁用保存命令历史。
+
+  总的来说，这个`_cli_loop`方法实现了一个循环，用于持续地等待用户输入命令，执行命令，以及处理保存命令历史的逻辑。
+
+
+
+
+
+## 
+
+
+
+
+
+
+
+
+
+# —endline—
